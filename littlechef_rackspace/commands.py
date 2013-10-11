@@ -1,5 +1,6 @@
 import sys
 
+
 class Command(object):
 
     requires_api = False
@@ -13,6 +14,7 @@ class Command(object):
 
     def validate_args(self, **kwargs):
         return True
+
 
 class RackspaceCreate(Command):
 
@@ -45,6 +47,7 @@ class RackspaceCreate(Command):
 
         return True
 
+
 class RackspaceListImages(Command):
 
     name = "list-images"
@@ -56,6 +59,7 @@ class RackspaceListImages(Command):
         for image in images:
             progress.write('{0}{1}\n'.format(image['id'].ljust(43), image['name']))
 
+
 class RackspaceListFlavors(Command):
 
     name = "list-flavors"
@@ -66,6 +70,7 @@ class RackspaceListFlavors(Command):
         flavors = self.rackspace_api.list_flavors()
         for flavor in flavors:
             progress.write('{0}{1}\n'.format(flavor['id'].ljust(10), flavor['name']))
+
 
 class RackspaceListNetworks(Command):
 
@@ -81,3 +86,17 @@ class RackspaceListNetworks(Command):
             progress.write('{0}{1}{2}\n'.format(network['id'].ljust(41),
                                                 cidr.ljust(20),
                                                 network['name']))
+
+class RackspaceListServers(Command):
+
+    name = "list-servers"
+    description = "List servers for a region"
+    requires_api = True
+
+    def execute(self, progress=sys.stderr, **kwargs):
+        servers = self.rackspace_api.list_servers()
+
+        for server in servers:
+            progress.write('{0}{1}{2}\n'.format(server['id'].ljust(41),
+                                                server['name'].ljust(20),
+                                                server['public_ipv4']))

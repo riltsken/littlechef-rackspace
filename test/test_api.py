@@ -16,7 +16,7 @@ class RackspaceApiTest(unittest.TestCase):
 
         self.pending_node = Node(id='id', name='name', public_ips=[], private_ips=[],
                                  state=NodeState.PENDING, driver=None)
-        self.active_node = Node(id='id', name='name', public_ips=[ '50.2.3.4'], private_ips=[],
+        self.active_node = Node(id='id', name='name', public_ips=['50.2.3.4'], private_ips=[],
                                 state=NodeState.RUNNING, driver=None)
 
 
@@ -100,6 +100,25 @@ class RackspaceApiTest(unittest.TestCase):
                                'name': lc_size2.name
                            }], api.list_flavors())
 
+    def test_list_servers_returns_server_information(self):
+        conn = mock.Mock()
+        api = self._get_api_with_mocked_conn(conn)
+
+        lc_node1 = Node('1', 'server1', None, ['50.50.50.50'], [], None)
+        lc_node2 = Node('2', 'server2', None, ['51.51.51.51'], [], None)
+
+        conn.list_nodes.return_value = [lc_node1, lc_node2]
+
+        self.assertEquals([{
+                               'id': lc_node1.id,
+                               'name': lc_node1.name,
+                               'public_ipv4': lc_node1.public_ips[0]
+                           }, {
+                               'id': lc_node2.id,
+                               'name': lc_node2.name,
+                               'public_ipv4': lc_node2.public_ips[0]
+                           }], api.list_servers())
+
     def test_list_networks_returns_network_information(self):
         conn = mock.Mock()
         api = self._get_api_with_mocked_conn(conn)
@@ -109,7 +128,7 @@ class RackspaceApiTest(unittest.TestCase):
                                     driver=None)
         conn.ex_list_networks.return_value = [network1]
 
-        self.assertEquals([{ 'id': network1.id, 'name': network1.name, 'cidr': network1.cidr }],
+        self.assertEquals([{'id': network1.id, 'name': network1.name, 'cidr': network1.cidr}],
                           api.list_networks())
 
     def test_creates_node(self):
@@ -199,6 +218,7 @@ class RackspaceApiTest(unittest.TestCase):
         conn.create_node.return_value = self.pending_node
 
         self.counter = 0
+
         def ex_get_node_details(id):
             if self.counter == 5:
                 return self.active_node
@@ -221,11 +241,11 @@ class RackspaceApiTest(unittest.TestCase):
                                    progress=progress)
 
             self.assertEquals([
-                "Creating node {0} (image: {1}, flavor: {2})...".format(node_name, image_id, flavor_id),
-                "Created node {0} (id: {1}, password: {2})".format(node_name, self.pending_node.id, password),
-                "Waiting for node to become active{0}".format("." * 6),
-                "Node active! (host: {0})".format(host.ip_address)
-            ], progress.getvalue().splitlines())
+                                  "Creating node {0} (image: {1}, flavor: {2})...".format(node_name, image_id, flavor_id),
+                                  "Created node {0} (id: {1}, password: {2})".format(node_name, self.pending_node.id, password),
+                                  "Waiting for node to become active{0}".format("." * 6),
+                                  "Node active! (host: {0})".format(host.ip_address)
+                              ], progress.getvalue().splitlines())
 
     def _get_api(self, region):
         return RackspaceApi(self.username, self.key, region)

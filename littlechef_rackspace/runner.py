@@ -5,14 +5,15 @@ from fabric.utils import abort
 import littlechef
 from api import RackspaceApi, Regions
 from deploy import ChefDeployer
-from commands import RackspaceCreate, RackspaceListImages, RackspaceListFlavors, RackspaceListNetworks
+from commands import RackspaceCreate, RackspaceListImages, RackspaceListFlavors, RackspaceListNetworks, RackspaceListServers
 
 
 def get_command_classes():
     return [RackspaceCreate,
             RackspaceListImages,
             RackspaceListFlavors,
-            RackspaceListNetworks]
+            RackspaceListNetworks,
+            RackspaceListServers]
 
 
 class FailureMessages:
