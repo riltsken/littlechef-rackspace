@@ -113,6 +113,10 @@ class RackspaceApi(object):
                     ip_address=public_ipv4_address,
                     password=password)
 
+    def rebuild_node(self, server, image, flavor, public_key_file, networks=None, progress=None):
+        pass
+
+
 class Regions(object):
 
     NOT_FOUND = 0
